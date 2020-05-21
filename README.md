@@ -1,2 +1,3 @@
-# Uno-Java
-Terminal based Uno (card game)
+# UnoJava
+A terminal based Uno (card game)\
+Game rules: https://www.unorules.com/
