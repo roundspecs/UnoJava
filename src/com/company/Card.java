@@ -16,4 +16,9 @@ public class Card {
         else if (color.equals("Wild")) return 40;
         else return Integer.parseInt(symbol);
     }
+
+    @Override
+    public String toString() {
+        return color + " " + symbol;
+    }
 }
