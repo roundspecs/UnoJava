@@ -1,3 +1,3 @@
 # UnoJava
 A terminal based Uno (card game)\
-Game rules: https://www.unorules.com/
+Game rules: https://service.mattel.com/instruction_sheets/42001pr.pdf
