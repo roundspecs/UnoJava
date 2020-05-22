@@ -8,8 +8,8 @@ public class Player {
     final ArrayList<Card> hand = new ArrayList<>();
     private final Scanner sc = new Scanner(System.in);
     private final String name;
-    private final DrawPile drawPile;
-    private final DiscardPile discardPile;
+    private DrawPile drawPile;
+    private DiscardPile discardPile;
     int score;
     boolean calledUno;
 
@@ -18,6 +18,13 @@ public class Player {
         this.drawPile = drawPile;
         this.discardPile = discardPile;
         drawCards(7);
+    }
+
+    void reinit(DiscardPile discardPile, DrawPile drawPile) {
+        hand.clear();
+        drawCards(7);
+        this.discardPile = discardPile;
+        this.drawPile = drawPile;
     }
 
     void drawCards(int num) {

@@ -1,6 +1,7 @@
 package com.company;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DiscardPile {
     private final Card[] cards = new Card[10];
@@ -10,7 +11,7 @@ public class DiscardPile {
     DiscardPile(DrawPile drawPile) {
         this.drawPile = drawPile;
         while (numOfCards == 0 || peek().color.equals("Wild"))
-            pushAndReset(drawPile.drawCards(1)[0]);
+            push(drawPile.drawCards(1)[0]);
     }
 
     public Card peek() {
@@ -60,7 +61,7 @@ public class DiscardPile {
             if (card.symbol.equals("") || card.symbol.equals("+4"))
                 card.color = "Wild";
         }
-        drawPile.putCards(cards);
+        drawPile.putCards(Arrays.copyOfRange(cards, 0, numOfCards));
         numOfCards = 0;
         push(topCard);
     }

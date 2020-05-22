@@ -15,7 +15,7 @@ public class Main {
     private static byte direction = 1;
     private static DrawPile drawPile;
     private static DiscardPile discardPile;
-    private static byte playerIndex;
+    private static Byte playerIndex;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Player winner = winner();
@@ -31,7 +31,7 @@ public class Main {
 
             // ask for player names and create them if already doesn't exist else re-initialize
             initPlayers();
-            playerIndex = (byte) random.nextInt(numOfPlayers);
+            if (playerIndex == null) playerIndex = (byte) random.nextInt(numOfPlayers);
 
             for (; true; next()) {
                 player = players[playerIndex];
@@ -73,7 +73,7 @@ public class Main {
                             if (p != player)
                                 for (Card card : p.hand)
                                     player.score += card.faceValue();
-                        promptMessage(player + " won!\nScore: " + player.score);
+                        promptMessage(player + " won the round!\nScore: " + player.score);
                         break;
                     }
                 } else if (options.contains(ans)) {
@@ -121,7 +121,7 @@ public class Main {
             case "Reverse" -> {
                 promptMessage("That mofo played a reverse! -_-");
                 direction *= -1;
-                next();
+                if (numOfPlayers != 2) next();
             }
             case "+4" -> {
                 System.out.println("Challenge? (y/n)");
@@ -198,10 +198,7 @@ public class Main {
 
     private static void initPlayers() throws IOException, InterruptedException {
         if (players != null) {
-            for (Player p : players) {
-                p.hand.clear();
-                p.drawCards(7);
-            }
+            for (Player p : players) p.reinit(discardPile, drawPile);
             return;
         }
         clearScreen();

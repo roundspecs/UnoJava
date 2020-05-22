@@ -6,7 +6,7 @@ import java.util.Random;
 class DrawPile {
     private final static Random rand = new Random();
     private final Card[] cards = new Card[108];
-    byte numOfCards = 0;
+    private byte numOfCards = 0;
 
     DrawPile() {
         for (var color : Arrays.asList("Red", "Green", "Blue", "Yellow")) {
