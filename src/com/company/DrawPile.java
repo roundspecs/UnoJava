@@ -14,8 +14,9 @@ class DrawPile {
                 putCard(new Card(color, Byte.toString(symbol)));
             for (byte symbol = 1; symbol < 10; symbol++)
                 putCard(new Card(color, Byte.toString(symbol)));
-            for (var symbol : Arrays.asList("Reverse", "Skip", "+2")) for (byte i = 0; i < 2; i++)
-                putCard(new Card(color, symbol));
+            for (var symbol : Arrays.asList("Reverse", "Skip", "+2"))
+                for (byte i = 0; i < 2; i++)
+                    putCard(new Card(color, symbol));
         }
         for (var symbol : Arrays.asList("+4", ""))
             for (byte i = 0; i < 4; i++)

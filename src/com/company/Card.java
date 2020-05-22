@@ -3,8 +3,8 @@ package com.company;
 import java.util.Arrays;
 
 public class Card {
-    String color;
     final String symbol;
+    String color;
     /**
      * true if an action card or wild card is already used
      */
@@ -17,6 +17,7 @@ public class Card {
 
     /**
      * Number cards count their face value, all action cards count 20, and Wild and Wild Draw Four cards count 50.
+     *
      * @return points of the card
      */
     public byte faceValue() {

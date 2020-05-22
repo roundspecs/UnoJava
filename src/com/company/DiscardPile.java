@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class DiscardPile {
     private final Card[] cards = new Card[10];
-    private int numOfCards = 0;
     private final DrawPile drawPile;
+    private int numOfCards = 0;
 
     DiscardPile(DrawPile drawPile) {
         this.drawPile = drawPile;
@@ -14,7 +14,7 @@ public class DiscardPile {
     }
 
     public Card peek() {
-        return cards[numOfCards-1];
+        return cards[numOfCards - 1];
     }
 
     /**
@@ -34,7 +34,7 @@ public class DiscardPile {
     public boolean isMatchPrev(ArrayList<Card> cards) {
         var currCard = pop();
         var result = false;
-        for(var card : cards)
+        for (var card : cards)
             if (!card.symbol.equals("+4") && isMatch(card)) {
                 result = true;
                 break;
@@ -45,6 +45,7 @@ public class DiscardPile {
 
     /**
      * Pushes a card to the pile. If the pile is already full(max 10 cards), then resets the pile before pushing.
+     *
      * @param card card to be pushed
      */
     public void pushAndReset(Card card) {
@@ -63,7 +64,13 @@ public class DiscardPile {
         numOfCards = 0;
         push(topCard);
     }
-    private Card pop(){ return cards[--numOfCards]; }
-    private void push(Card card) { cards[numOfCards++] = card; }
+
+    private Card pop() {
+        return cards[--numOfCards];
+    }
+
+    private void push(Card card) {
+        cards[numOfCards++] = card;
+    }
 
 }
