@@ -15,90 +15,103 @@ public class Main {
     private static byte direction = 1;
     private static DrawPile drawPile;
     private static DiscardPile discardPile;
+    private static byte playerIndex;
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        drawPile = new DrawPile();
-        discardPile = new DiscardPile(drawPile);
+        Player winner = winner();
+        while (winner == null) {
+            drawPile = new DrawPile();
+            discardPile = new DiscardPile(drawPile);
 
-        // if first top card is a reverse card
-        if (discardPile.peek().symbol.equals("Reverse")) {
-            direction = -1;
-            discardPile.peek().actedUpon = true;
-        }
-
-        // ask for player names and create them
-        initPlayers();
-
-        for (byte playerIndex = (byte) random.nextInt(numOfPlayers); true; playerIndex = next(playerIndex)) {
-            player = players[playerIndex];
-            topCard = discardPile.peek();
-
-            promptMessage(player + "'s turn.");
-
-            // check if player forgot to say uno
-            if (player.hand.size() == 1 && !player.calledUno) {
-                player.drawCards(2);
-                promptMessage("You forgot to say uno.");
+            // if first top card is a reverse card
+            if (discardPile.peek().symbol.equals("Reverse")) {
+                direction = -1;
+                discardPile.peek().actedUpon = true;
             }
 
-            // acting upon the top card
-            if (!topCard.actedUpon) {
-                topCard.actedUpon = true;
-                if (actUpon(player, topCard.symbol, playerIndex)) continue;
-            }
+            // ask for player names and create them if already doesn't exist else re-initialize
+            initPlayers();
+            playerIndex = (byte) random.nextInt(numOfPlayers);
 
-            // printing out player name and top card
-            header();
+            for (; true; next()) {
+                player = players[playerIndex];
+                topCard = discardPile.peek();
 
-            // printing out available options
-            ArrayList<String> options = getOptions(topCard, player);
-            System.out.print("Options: ");
-            for (var option : options)
-                System.out.print(option + " ");
-            System.out.println();
+                promptMessage(player + "'s turn.");
 
-            // printing out the cards in player's hand
-            var playable = player.showHand();
-
-            // promting the player to play a card or choose an option
-            var ans = sc.nextLine().toLowerCase();
-            if (isInt(ans) && playable.contains(Integer.parseInt(ans))) {
-                player.playCard(Integer.parseInt(ans) - 1);
-                if (player.hand.isEmpty()) {
-                    clearScreen();
-                    System.out.println(player + " won!");
-                    for (Player p : players)
-                        if (p != player)
-                            for (Card card : p.hand)
-                                player.score += card.faceValue();
-                    System.out.println("Score: " + player.score);
-                    break;
+                // check if player forgot to say uno
+                if (player.hand.size() == 1 && !player.calledUno) {
+                    player.drawCards(2);
+                    promptMessage("You forgot to say uno.");
                 }
-            } else if (options.contains(ans)) {
-                switch (ans) {
-                    case "draw" -> {
-                        var calledUno = player.calledUno;
-                        player.drawCards(1);
-                        var card = player.hand.get(player.hand.size() - 1);
-                        if (discardPile.isMatch(card)) {
-                            System.out.println("Play " + card + "? (y/n)");
-                            if (sc.nextLine().equals("y")) {
-                                player.playCard((player.hand.size() - 1));
-                                if (player.hand.size() == 1)
-                                    player.calledUno = calledUno;
+
+                // acting upon the top card
+                if (!topCard.actedUpon) {
+                    topCard.actedUpon = true;
+                    if (actUpon(player, topCard.symbol)) continue;
+                }
+
+                // printing out player name and top card
+                header();
+
+                // printing out available options
+                ArrayList<String> options = getOptions(topCard, player);
+                System.out.print("Options: ");
+                for (var option : options)
+                    System.out.print(option + " ");
+                System.out.println();
+
+                // printing out the cards in player's hand
+                var playable = player.showHand();
+
+                // prompting the player to play a card or choose an option
+                var ans = sc.nextLine().toLowerCase();
+                if (isInt(ans) && playable.contains(Integer.parseInt(ans))) {
+                    player.playCard(Integer.parseInt(ans) - 1);
+                    if (player.hand.isEmpty()) {
+                        for (Player p : players)
+                            if (p != player)
+                                for (Card card : p.hand)
+                                    player.score += card.faceValue();
+                        promptMessage(player + " won!\nScore: " + player.score);
+                        break;
+                    }
+                } else if (options.contains(ans)) {
+                    switch (ans) {
+                        case "draw" -> {
+                            var calledUno = player.calledUno;
+                            player.drawCards(1);
+                            var card = player.hand.get(player.hand.size() - 1);
+                            if (discardPile.isMatch(card)) {
+                                System.out.println("Play " + card + "? (y/n)");
+                                if (sc.nextLine().equals("y")) {
+                                    player.playCard((player.hand.size() - 1));
+                                    if (player.hand.size() == 1)
+                                        player.calledUno = calledUno;
+                                }
                             }
                         }
+                        case "uno" -> {
+                            player.calledUno = true;
+                            previous();
+                        }
                     }
-                    case "uno" -> {
-                        player.calledUno = true;
-                        playerIndex = prev(playerIndex);
-                    }
-                }
-            } else playerIndex = prev(playerIndex);
+                } else previous();
+            }
+            winner = winner();
         }
+        promptMessage(winner + " won the game!\nScore: " + winner.score);
     }
 
-    private static boolean actUpon(Player player, String symbol, byte playerIndex) throws IOException, InterruptedException {
+    private static Player winner() {
+        if (players == null) return null;
+        for (Player p : players)
+            if (p.score >= 500)
+                return p;
+        return null;
+    }
+
+    private static boolean actUpon(Player player, String symbol) throws IOException, InterruptedException {
         switch (symbol) {
             case "+2" -> {
                 promptMessage("You have drawn 2 cards because the board card was a +2");
@@ -108,11 +121,12 @@ public class Main {
             case "Reverse" -> {
                 promptMessage("That mofo played a reverse! -_-");
                 direction *= -1;
+                next();
             }
             case "+4" -> {
                 System.out.println("Challenge? (y/n)");
                 if (sc.nextLine().equalsIgnoreCase("y")) {
-                    Player prevPlayer = players[prev(playerIndex)];
+                    Player prevPlayer = players[prev()];
                     if (discardPile.isMatchPrev(prevPlayer.hand)) {
                         prevPlayer.drawCards((byte) 4);
                         promptMessage("Challenge successful. Previous player picked 4 cards");
@@ -170,15 +184,26 @@ public class Main {
         return options;
     }
 
-    private static byte prev(byte playerIndex) {
+    private static void previous() {
+        playerIndex = (byte) ((playerIndex + numOfPlayers - direction) % numOfPlayers);
+    }
+
+    private static byte prev() {
         return (byte) ((playerIndex + numOfPlayers - direction) % numOfPlayers);
     }
 
-    private static byte next(byte playerIndex) {
-        return (byte) ((playerIndex + numOfPlayers + direction) % numOfPlayers);
+    private static void next() {
+        playerIndex = (byte) ((playerIndex + numOfPlayers + direction) % numOfPlayers);
     }
 
     private static void initPlayers() throws IOException, InterruptedException {
+        if (players != null) {
+            for (Player p : players) {
+                p.hand.clear();
+                p.drawCards(7);
+            }
+            return;
+        }
         clearScreen();
         while (numOfPlayers < 2) {
             System.out.print("Enter the number of players: ");
@@ -193,6 +218,7 @@ public class Main {
             System.out.print(i + ". ");
             players[i - 1] = new Player(sc.next(), drawPile, discardPile);
         }
+
     }
 
     private static void clearScreen() throws IOException, InterruptedException {
